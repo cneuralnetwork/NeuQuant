@@ -18,7 +18,15 @@ from transformers.trainer import Trainer
 from transformers.training_args import TrainingArguments
 from transformers.data.data_collator import DataCollatorWithPadding
 from transformers.utils import logging as transformers_logging
-from transformers.utils.quantization_config import BitsAndBytesConfig
+
+# Try to import BitsAndBytesConfig, handle gracefully if not available
+try:
+    from transformers.utils.quantization_config import BitsAndBytesConfig
+
+    HAS_BITSANDBYTES = True
+except ImportError:
+    BitsAndBytesConfig = None
+    HAS_BITSANDBYTES = False
 
 
 def setup_logging(verbose: bool) -> None:
@@ -33,6 +41,14 @@ def setup_logging(verbose: bool) -> None:
         if verbose
         else transformers_logging.set_verbosity_warning()
     )
+
+    # Warn about BitsAndBytes availability
+    if not HAS_BITSANDBYTES:
+        logging.warning(
+            "BitsAndBytes not available on this platform (likely macOS). "
+            "4-bit and 8-bit quantization will be disabled. "
+            "Available modes: dynamic, qat, weight_only"
+        )
 
 
 def get_model_size(model: PreTrainedModel) -> float:
@@ -62,10 +78,19 @@ def load_model_and_tokenizer(
     }
 
     if quant_mode in ["8bit", "4bit"]:
+        if not HAS_BITSANDBYTES:
+            raise RuntimeError(
+                f"{quant_mode} quantization requires BitsAndBytes, which is not available on this platform. "
+                "On macOS, BitsAndBytes is not supported. Use 'dynamic', 'qat', or 'weight_only' quantization instead."
+            )
+
         if quant_mode == "8bit":
+            quantization_config = BitsAndBytesConfig(
+                load_in_8bit=True,
+            )
             model = AutoModelForCausalLM.from_pretrained(
                 model_name,
-                load_in_8bit=True,
+                quantization_config=quantization_config,
                 device_map="auto",
             )
         else:  # 4bit
@@ -195,7 +220,7 @@ def main():
         type=str,
         required=True,
         choices=["8bit", "4bit", "dynamic", "qat", "weight_only"],
-        help="Type of quantization",
+        help="Type of quantization (Note: 8bit/4bit require BitsAndBytes, not available on macOS)",
     )
     parser.add_argument(
         "--push_to_hub",
