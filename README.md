@@ -95,7 +95,6 @@ python main.py \
 ### Analysis and Visualization Arguments
 - `--analyze_architecture`: Analyze model architecture and provide insights
 - `--save_report`: Save detailed quantization report in JSON format
-- `--visualize`: Generate visualizations of model structure and quantization results
 - `--generate_recommendations`: Generate recommendations for selective quantization
 
 ### Selective Quantization Arguments
