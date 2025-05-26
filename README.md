@@ -120,4 +120,5 @@ python main.py \
 - Model size reduction information is displayed during quantization
 - QAT mode requires a dataset for fine-tuning
 - Dynamic quantization is applied to Linear and LSTM layers
-- Weight-only quantization preserves activation precision 
+- Weight-only quantization preserves activation precision
+
