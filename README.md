@@ -92,6 +92,15 @@ python main.py \
 - `--train_batch_size`: Training batch size (default: 8)
 - `--learning_rate`: Learning rate for fine-tuning (default: 2e-5)
 
+### Analysis and Visualization Arguments
+- `--analyze_architecture`: Analyze model architecture and provide insights
+- `--save_report`: Save detailed quantization report in JSON format
+- `--generate_recommendations`: Generate recommendations for selective quantization
+
+### Selective Quantization Arguments
+- `--selective`: Enable selective quantization (preserving critical layers)
+- `--exclude_patterns`: Patterns to exclude from quantization (e.g., "layernorm" "embedding")
+
 ## Examples
 
 ### Dynamic Quantization with Local Save
@@ -120,4 +129,4 @@ python main.py \
 - Model size reduction information is displayed during quantization
 - QAT mode requires a dataset for fine-tuning
 - Dynamic quantization is applied to Linear and LSTM layers
-- Weight-only quantization preserves activation precision 
+- Weight-only quantization preserves activation precision
